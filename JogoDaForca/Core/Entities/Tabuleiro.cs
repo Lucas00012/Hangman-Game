@@ -14,7 +14,7 @@ namespace JogoDaForca.Core.Entities
             Console.Clear();
             PrepararJogo(vidas);
 
-            while (!VerificarDerrota() && !VerificarVitoria())
+            while (true)
             {
                 MostrarSituacaoTabuleiro();
 
@@ -29,19 +29,29 @@ namespace JogoDaForca.Core.Entities
                     continue;
                 }
 
-                LetrasHistorico.Add(letra);
+                EscolherLetra(letra);
 
-                if (!Palavra.Contains(letra))
+                if (VerificarDerrota() || VerificarVitoria())
                 {
-                    Vidas--;
-                    Console.WriteLine("Oops! Você perdeu uma vida!");
+                    Console.Clear();
+                    Console.WriteLine("FIM DE JOGO!");
+                    Console.WriteLine($"VOCÊ {(VerificarDerrota() ? "PERDEU" : "GANHOU")}");
+                    Console.WriteLine($"A PALAVRA ERA: {Palavra}");
+
+                    return;
                 }
             }
+        }
 
-            Console.Clear();
-            Console.WriteLine("FIM DE JOGO!");
-            Console.WriteLine($"VOCÊ {(VerificarDerrota() ? "PERDEU" : "GANHOU")}");
-            Console.WriteLine($"A PALAVRA ERA: {Palavra}");
+        private void EscolherLetra(char letra)
+        {
+            LetrasHistorico.Add(letra);
+
+            if (!Palavra.Contains(letra))
+            {
+                Vidas--;
+                Console.WriteLine("Oops! Você perdeu uma vida!");
+            }
         }
 
         private void PrepararJogo(int vidas)
@@ -55,11 +65,7 @@ namespace JogoDaForca.Core.Entities
         private void SortearPalavra()
         {
             Console.WriteLine("CARREGANDO....");
-
-            var html = ScrapperHelper.ObterHtml("https://www.palabrasaleatorias.com/palavras-aleatorias.php").Result;
-            var palavra = html.DocumentNode.SelectSingleNode("//html/body/center/table/tr/td/div").InnerText.ToUpper();
-
-            Palavra = palavra.Replace("\r\n", string.Empty);
+            Palavra = ScrapperHelper.ObterPalavra().Result;
 
             Console.Clear();
         }
@@ -71,8 +77,8 @@ namespace JogoDaForca.Core.Entities
             Console.WriteLine();
             Console.Write("PALAVRA: ");
 
-            foreach (var caractere in Palavra)
-                Console.Write(PodeExibirCaractere(caractere) ? caractere : '_');
+            foreach (var caracterePalavra in Palavra)
+                Console.Write(PodeExibirCaractere(caracterePalavra) ? caracterePalavra : '_');
 
             Console.WriteLine();
         }
@@ -89,7 +95,7 @@ namespace JogoDaForca.Core.Entities
 
         private bool VerificarDerrota()
         {
-            return Vidas == -1;
+            return Vidas < 0;
         }
     }
 }

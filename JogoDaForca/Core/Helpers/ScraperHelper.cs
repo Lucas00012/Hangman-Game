@@ -10,17 +10,19 @@ namespace JogoDaForca.Core.Helpers
 {
     public static class ScrapperHelper
     {
-        public static async Task<HtmlDocument> ObterHtml(string url)
+        public static async Task<string> ObterPalavra()
         {
             var client = new RestClient();
-            var request = new RestRequest(url, Method.Get);
+            var request = new RestRequest("https://www.palabrasaleatorias.com/palavras-aleatorias.php", Method.Get);
 
             var response = await client.ExecuteAsync(request);
 
             var htmlDoc = new HtmlDocument();
             htmlDoc.LoadHtml(response.Content);
 
-            return htmlDoc;
+            var palavra = htmlDoc.DocumentNode.SelectSingleNode("//html/body/center/table/tr/td/div").InnerText.ToUpper();
+
+            return palavra.ToUpper().Replace("\r\n", string.Empty);
         }
     }
 }
