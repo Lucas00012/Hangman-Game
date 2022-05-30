@@ -90,7 +90,7 @@ namespace JogoDaForca.Core.Entities
 
         private bool VerificarVitoria()
         {
-            return Palavra.All(caractere => PodeExibirCaractere(caractere));
+            return Palavra.All(caracterePalavra => PodeExibirCaractere(caracterePalavra));
         }
 
         private bool VerificarDerrota()
